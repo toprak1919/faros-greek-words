@@ -441,7 +441,7 @@ function render(){
     const txt=WD[o.w].el;if(e.textContent!==txt)e.textContent=txt;e.style.display='block';e.style.transform=`translate(calc(${(o.sx/BW*innerWidth).toFixed(1)}px - 50%),calc(${((o.sy-o.z-o.m.h-10)/BH*innerHeight).toFixed(1)}px - 100%))`}
   const ms=state==='play'&&here?mouths(here):[];
   for(let i=0;i<6;i++){const e=signs[i],m=ms[i],o=m&&{x:m[0]+m[2]*7,y:m[1]+m[3]*7};if(!m||!scr(o)){if(e.style.display!=='none')e.style.display='none';continue}
-    const dst=m[4].A===here?m[4].Bz:m[4].A,txt=dst.kind==='secret'&&!S.seen[dst.k]?'✦ ;':(dst.kind==='zone'&&S.lit[dst.i]?'★ ':'')+dst.el;if(e.textContent!==txt)e.textContent=txt;e.style.display='block';e.style.transform=`translate(calc(${(o.sx/BW*innerWidth).toFixed(1)}px - 50%),calc(${((o.sy-14)/BH*innerHeight).toFixed(1)}px - 100%))`}
+    const dst=m[4].A===here?m[4].Bz:m[4].A,txt=dst.kind==='secret'&&!S.seen[dst.k]?'✦ ?':(dst.kind==='zone'&&S.lit[dst.i]?'★ ':'')+dst.el;if(e.textContent!==txt)e.textContent=txt;e.style.display='block';e.style.transform=`translate(calc(${(o.sx/BW*innerWidth).toFixed(1)}px - 50%),calc(${((o.sy-14)/BH*innerHeight).toFixed(1)}px - 100%))`}
 }
 const mc=$('mini').getContext('2d');
 function drawWorld(c,size,big){c.clearRect(0,0,size,size);const s=size/1640,ox=size/2-150*s,oy=size/2-110*s;c.lineCap='round';c.strokeStyle=big?'rgba(200,160,110,.95)':'rgba(255,255,255,.6)';c.lineWidth=big?4:1.5;
