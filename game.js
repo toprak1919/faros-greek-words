@@ -72,8 +72,13 @@ function addBridge(A,Bz){const a=Math.atan2(Bz.y-A.y,Bz.x-A.x),ra=A.coast(a)-5,r
   const n=Math.ceil(b.len/26);b.segs=[];for(let i=0;i<n;i++){const t=n===1?0.5:(14+(b.len-28)*i/(n-1))/b.len;b.segs.push({m:M.plank,x:b.x0+(b.x1-b.x0)*t,y:b.y0+(b.y1-b.y0)*t,z:0,rot:a})}}
 ZONES.forEach((z,i)=>{addBridge(HUB,z);addBridge(z,ZONES[(i+1)%10])});
 function bridgeDist(x,y){let best=1e9;for(const b of BRIDGES){const dx=b.x1-b.x0,dy=b.y1-b.y0;let t=((x-b.x0)*dx+(y-b.y0)*dy)/(b.len*b.len);t=Math.max(0,Math.min(1,t));const q=Math.hypot(x-b.x0-dx*t,y-b.y0-dy*t);if(q<best)best=q}return best}
+function bridgePoint(x,y){let best=1e9,r=[x,y];for(const b of BRIDGES){const dx=b.x1-b.x0,dy=b.y1-b.y0;let t=((x-b.x0)*dx+(y-b.y0)*dy)/(b.len*b.len);t=Math.max(0,Math.min(1,t));const px=b.x0+dx*t,py=b.y0+dy*t,q=Math.hypot(x-px,y-py);if(q<best){best=q;r=[px,py]}}return r}
+function nearestBridge(x,y){let r={dist:1e9};for(const b of BRIDGES){const dx=b.x1-b.x0,dy=b.y1-b.y0;let t=((x-b.x0)*dx+(y-b.y0)*dy)/(b.len*b.len);t=Math.max(0,Math.min(1,t));const q=Math.hypot(x-b.x0-dx*t,y-b.y0-dy*t);if(q<r.dist)r={dist:q,b,t:t*b.len}}return r}
+function proj(b,x,y){const ax=Math.cos(b.a),ay=Math.sin(b.a),t=Math.max(0,Math.min(b.len,(x-b.x0)*ax+(y-b.y0)*ay));return{t,dist:Math.hypot(x-b.x0-ax*t,y-b.y0-ay*t)}}
+function isletOf(x,y){for(const d of ISLETS)if(Math.abs(x-d.x)<d.half&&Math.abs(y-d.y)<d.half&&d.level(x,y)>=0)return d;return null}
+function mouths(d){if(!d.mouths){d.mouths=[];for(const b of BRIDGES){if(Math.hypot(b.x0-d.x,b.y0-d.y)<d.half)d.mouths.push([b.x0,b.y0,Math.cos(b.a),Math.sin(b.a),b]);if(Math.hypot(b.x1-d.x,b.y1-d.y)<d.half)d.mouths.push([b.x1,b.y1,-Math.cos(b.a),-Math.sin(b.a),b])}}return d.mouths}
 function isletAt(x,y){for(const d of ISLETS)if(Math.abs(x-d.x)<d.half&&Math.abs(y-d.y)<d.half){const l=d.level(x,y);if(l>=0)return l}return -1}
-const walkable=(x,y)=>isletAt(x,y)>=0||bridgeDist(x,y)<=3.2;
+const walkable=(x,y)=>isletAt(x,y)>=0||bridgeDist(x,y)<=3.6;
 function groundZ(x,y){const l=isletAt(x,y);if(l>=1)return l*TS;return bridgeDist(x,y)<=3.6?3:Math.max(0,l)*TS}
 function populate(d){
   const rnd=mulberry(d.seed+3),placed=[],W2=(a,r)=>[d.x+Math.cos(a)*r,d.y+Math.sin(a)*r];
@@ -190,7 +195,7 @@ function toScreen(wx,wy){const dx=wx-cam.x,dy=wy-cam.y,c=Math.cos(cam.r),s=Math.
 function worldT(z){ctx.setTransform(1,0,0,K,CX,CY-(z||0));ctx.rotate(cam.r);ctx.translate(-cam.x,-cam.y)}
 
 /* ---------- update ---------- */
-let hintTxt='',banTxt='',target=null,touched=null;
+let hintTxt='',banTxt='',target=null,touched=null,seek=null;
 function update(dt){
   T+=dt;
   if(state==='title'){cam.r+=dt*0.1;cam.x=ZONES[0].x*0.5;cam.y=ZONES[0].y*0.62;return}
@@ -199,9 +204,22 @@ function update(dt){
     let ix=0,iy=0;if(keys['a']||keys['arrowleft'])ix-=1;if(keys['d']||keys['arrowright'])ix+=1;if(keys['w']||keys['arrowup'])iy-=1;if(keys['s']||keys['arrowdown'])iy+=1;
     if(ptr.down){const[px,py]=toScreen(player.x,player.y),vx=ptr.x-px,vy=(ptr.y-(py-player.z))/K,l=Math.hypot(vx,vy);if(l>6){ix=vx/l;iy=vy/l}}
     const l=Math.hypot(ix,iy);
+    if(l<=0.01)seek=null;
     if(l>0.01){ix/=l;iy/=l;const c=Math.cos(cam.r),s=Math.sin(cam.r),wx=ix*c+iy*s,wy=-ix*s+iy*c,sp=66*dt,nx=player.x+wx*sp,ny=player.y+wy*sp;
-      if(walkable(nx,ny)){player.x=nx;player.y=ny}else if(walkable(nx,player.y))player.x=nx;else if(walkable(player.x,ny))player.y=ny;
-      player.dir=Math.atan2(wy,wx);player.moving=true;cam.r-=ix*0.28*dt}
+      let mv=false;const step=(tx,ty)=>{const l2=Math.hypot(tx-player.x,ty-player.y);if(l2<0.05)return false;const ux=(tx-player.x)/l2,uy=(ty-player.y)/l2,m=Math.min(sp,l2),qx=player.x+ux*m,qy=player.y+uy*m;
+        if(!walkable(qx,qy))return false;player.x=qx;player.y=qy;player.dir=Math.atan2(uy,ux);return true};
+      if(seek&&(T>seek.t||wx*seek.wx+wy*seek.wy<0.6||Math.hypot(seek.m[0]-player.x,seek.m[1]-player.y)<1.5))seek=null;
+      if(seek){mv=step(seek.m[0],seek.m[1]);if(!mv)seek=null}
+      if(mv){}else if(walkable(nx,ny)){player.x=nx;player.y=ny;player.dir=Math.atan2(wy,wx);mv=true}
+      else{ // blocked by an edge: ride the bridge you are on, or head for the bridge that leads where you are pushing
+        const d=isletOf(player.x,player.y);let rb=null;
+        if(!d){const nb=nearestBridge(player.x,player.y);if(nb.dist<4.4)rb=nb.b}
+        else{let best=null,bd=0.3;for(const m of mouths(d)){const dt2=m[2]*wx+m[3]*wy;if(dt2>bd){bd=dt2;best=m}}
+          if(best){if(proj(best[4],player.x,player.y).dist<4.4)rb=best[4];else{seek={m:best,wx,wy,t:T+4};mv=step(best[0],best[1])}}}
+        if(rb&&!mv){const ax=Math.cos(rb.a),ay=Math.sin(rb.a),dp=wx*ax+wy*ay;if(Math.abs(dp)>0.15){const t2=Math.max(0,Math.min(rb.len,proj(rb,player.x,player.y).t+Math.sign(dp)*sp*1.5));mv=step(rb.x0+ax*t2,rb.y0+ay*t2)}}
+        if(!mv)for(const da of[0.5,-0.5,1,-1,1.45,-1.45]){const ca=Math.cos(da),sa=Math.sin(da);if(step(player.x+(wx*ca-wy*sa)*sp,player.y+(wx*sa+wy*ca)*sp)){mv=true;break}}
+      }
+      if(!mv)player.dir=Math.atan2(wy,wx);player.moving=mv;cam.r-=ix*0.28*dt}
     if(keys['q'])cam.r+=dt*1.5;if(keys['e'])cam.r-=dt*1.5;
     const list=curZone>=0?zoneObjs(curZone):[];
     if(touched&&Math.hypot(touched.x-player.x,touched.y-player.y)>15)touched=null;

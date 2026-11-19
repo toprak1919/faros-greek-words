@@ -68,7 +68,7 @@ const WD=[];const W=(el,tr,en,v)=>WD.push({el,tr,en,m:bake(v)});
 const GREY3=[0x9a958c,0x878279,0xaaa59c];
 
 // ---- 0 Demeter: fruit & vegetables
-W('το μήλο','to mílo','apple',B(9,9,11,v=>{v.ell(4,4,4,4,4,4,pick([RD,0xc8302a,0xe04a38],1));v.box(4,4,8,4,4,10,DB);v.box(5,4,9,7,4,9,GN);v.box(5,3,9,6,5,9,GN)}));
+W('το μήλο','to mílo','apple',B(9,9,11,v=>{v.ell(4,4,4,4,4,4,(x,y,z)=>x>5&&z>3?0xe8703a:[0x8fc93a,0x9fd44a,0x7fb92e][(x*3+y*5+z)%3]);v.box(4,4,8,4,4,10,DB);v.box(5,4,9,7,4,9,GN);v.box(5,3,9,6,5,9,GN)}));
 W('το πορτοκάλι','to portokáli','orange',B(16,9,9,v=>{v.ell(4,4,4,4,4,4,pick([OR,0xe07c12],2));v.box(3,4,8,5,4,8,DG);v.box(4,3,8,4,5,8,DG);
   v.ell(11.5,4,0,3.6,3.6,3.2,0xe07c12);v.cyl(11.5,4,3,3,3.4,(x,y)=>{const d=Math.hypot(x-11.5,y-4),a=Math.atan2(y-4,x-11.5);return d>2.7?WH:(Math.abs(Math.sin(a*3))<0.3?WH:0xffa838)})}));
 W('το λεμόνι','to lemóni','lemon',B(15,7,8,v=>{v.ell(7,3,3,5,3,3,pick([YL,0xf7dc4a],3));v.box(1,3,3,2,3,3,YL);v.box(12,3,3,13,3,3,YL);v.set(0,3,3,0xd9b82a);v.set(14,3,3,0xd9b82a);v.box(12,3,4,13,3,5,GN);v.box(12,2,5,13,4,5,GN)}));
@@ -173,7 +173,7 @@ W('ο φάρος','o fáros','lighthouse',B(9,9,18,v=>{v.cyl(4,4,0,1,4,GY);v.cyl
 W('η γέφυρα','i yéfira','bridge',B(19,7,8,v=>{for(let x=0;x<19;x++){const top=Math.round(5-((x-9)/9)**2*3);for(let z=0;z<=top;z++){if(((x-9)/6)**2+(z/3.5)**2<1){if(z===0)v.box(x,0,0,x,6,0,0x4aa8ea);continue}v.box(x,1,z,x,5,z,((x+z)&1)?0xb0a898:0x9a9288)}v.set(x,1,top+1,0x8a8278);v.set(x,5,top+1,0x8a8278)}}));
 W('το πηγάδι','to pigádi','well',B(11,11,14,v=>{v.ring(5,5,0,3,3,4.6,pick(GREY3,18));v.cyl(5,5,2,2,3,0x3d9be0);v.box(1,5,4,1,5,9,BR);v.box(9,5,4,9,5,9,BR);for(let i=0;i<3;i++)v.box(0,2+i,10+i,10,8-i,10+i,0xb5532f);v.box(1,5,8,9,5,8,DB);v.box(5,5,5,5,5,7,0xd9c9a0);v.box(5,5,3,6,6,4,0x9a9aa2)}));
 W('η κολόνα','i kolóna','column',B(9,9,17,v=>{v.box(1,1,0,7,7,0,MARBLE);v.cyl(4,4,1,1,3.2,MARBLE);v.cyl(4,4,2,12,2.4,(x,y)=>((x+y)&1)?0xe9e4d6:0xcfcabb);v.cyl(4,4,13,13,3,MARBLE);v.box(1,2,14,7,6,15,MARBLE);v.box(0,2,13,0,6,14,0xcfcabb);v.box(8,2,13,8,6,14,0xcfcabb)}));
-W('το άγαλμα','to ágalma','statue',B(9,9,19,v=>{v.box(1,1,0,7,7,3,0xbfb9a8);v.box(2,2,4,6,6,4,MARBLE);v.cyl(4,4,5,10,z=>2-(z-5)*0.08,MARBLE);v.box(3,3,11,5,5,13,MARBLE);v.box(4,6,12,4,6,16,MARBLE);v.box(4,2,9,4,2,13,MARBLE);v.box(3,3,14,5,5,16,0xf2eee2);v.set(4,6,17,GD);v.set(4,6,18,OR)}));
+W('το άγαλμα','to ágalma','statue',B(9,9,19,v=>{const c=pick([0x4f8f7f,0x5a9a8a,0x457f70],22);v.box(1,1,0,7,7,2,0xbfb9a8);v.box(2,2,3,6,6,3,MARBLE);v.box(4,3,4,4,3,8,c);v.box(4,5,4,4,5,8,c);v.box(3,2,9,5,6,12,c);v.box(4,1,8,4,1,12,c);v.box(4,7,11,4,7,16,c);v.box(3,3,13,5,5,15,c);v.box(3,3,16,5,5,16,GD);v.set(4,7,17,GD);v.set(4,7,18,OR)}));
 W('το σιντριβάνι','to sindriváni','fountain',B(13,13,12,v=>{v.ring(6,6,0,2,4.6,6,0xcfcabb);v.cyl(6,6,1,1,4.6,0x4aa8ea);v.cyl(6,6,0,6,1.2,MARBLE);v.cyl(6,6,7,7,3.2,0xcfcabb);v.ring(6,6,8,8,2.4,3.2,0xcfcabb);v.cyl(6,6,8,8,2.2,0x4aa8ea);v.box(6,6,8,6,6,10,MARBLE);v.set(6,6,11,0x9fd4f5);
   for(const[x,y]of[[6,2],[6,10],[2,6],[10,6]])v.box(x,y,2,x,y,7,0x9fd4f5)}));
 W('ο δρόμος','o drómos','road',B(17,10,10,v=>{v.box(0,1,0,16,7,0,(x,y)=>y===1||y===7?0x8a8a90:(y===4&&x%4<2)?WH:0x5a5a60);v.box(13,9,0,13,9,8,BR);v.box(9,9,6,14,9,8,YL);v.set(8,9,7,YL);v.box(2,9,0,3,9,2,WH);v.set(2,9,2,RD)}));
