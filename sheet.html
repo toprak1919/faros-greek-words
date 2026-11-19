@@ -1,0 +1,8 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="color-scheme" content="only light"><title>ΟΝΟΜΑΤΑ — all 100 sprites</title>
+<style>html{color-scheme:only light}body{margin:0;background:#bfe3f7;font:12px system-ui;color:#0b2a55}#g{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;padding:6px}
+.c{background:#eaf6fd;border-radius:6px;text-align:center;padding:2px}canvas{width:100%;image-rendering:pixelated;display:block}b{font-family:Georgia,serif}</style></head>
+<body><div id="g"></div><script src="sprites.js"></script><script>
+const cs=WD.map((w,i)=>{const d=document.createElement('div');d.className='c';const c=document.createElement('canvas');c.width=40;c.height=44;d.appendChild(c);
+ d.insertAdjacentHTML('beforeend',`<b>${w.el}</b><br>${i} ${w.en}`);g.appendChild(d);return c.getContext('2d')});
+let t=0;function f(){t+=0.012;cs.forEach((x,i)=>{x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,40,44);x.imageSmoothingEnabled=false;drawStack(x,WD[i].m,20,33,(window.ANG??t))});requestAnimationFrame(f)}f();
+</script></body></html>
