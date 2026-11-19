@@ -1,6 +1,6 @@
 'use strict';
 /* ============ sprite-stacking core: voxel models sliced into flat layers ============ */
-const TAU=Math.PI*2, K=0.72, ZS=1, QN=90;
+const TAU=Math.PI*2, K=0.72, ZS=1, QN=360;
 function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 function hash2(x,y,s){let n=Math.imul(x|0,374761393)^Math.imul(y|0,668265263)^Math.imul(s|0,1442695041);n=Math.imul(n^(n>>>13),1274126177);return((n^(n>>>16))>>>0)/4294967296}
 function vnoise(x,y,s){const xi=Math.floor(x),yi=Math.floor(y),fx=x-xi,fy=y-yi,u=fx*fx*(3-2*fx),v=fy*fy*(3-2*fy);
@@ -29,10 +29,12 @@ function bake(v){const{w,d,h,a}=v,layers=[];let n=0,sig=w+'x'+d+'x'+h+':';
   for(let i=0;i<a.length;i++)if(a[i]!=null)sig+=i.toString(36)+'.'+a[i].toString(36)+',';
   return{id:MID++,w,d,h,layers,cache:[],sr:Math.max(w,d)*0.42,n,sig}}
 /* every slice is drawn flat, one pixel above the last */
-function drawStack(ctx,m,sx,sy,rot){for(let i=0;i<m.h;i++){const L=m.layers[i];if(!L)continue;ctx.setTransform(1,0,0,K,sx,sy-i*ZS);ctx.rotate(rot);ctx.drawImage(L,-m.w/2,-m.d/2)}}
-function sprite(m,rot){let q=Math.round(rot/TAU*QN)%QN;if(q<0)q+=QN;let s=m.cache[q];if(!s){
-  const diag=Math.ceil(Math.hypot(m.w,m.d))+2,ch=Math.ceil(diag*K)+m.h*ZS+2,cv=mk(diag,ch),c=cv.getContext('2d');c.imageSmoothingEnabled=false;
-  const ox=diag/2,oy=ch-Math.ceil(diag*K/2)-1;drawStack(c,m,ox,oy,q*TAU/QN);s=m.cache[q]={cv,ox,oy}}return s}
+function drawStack(ctx,m,sx,sy,rot,sc){sc=sc||1;const c=Math.cos(rot)*sc,s=Math.sin(rot)*sc,hw=-m.w/2,hd=-m.d/2;
+  for(let i=0;i<m.h;i++){const L=m.layers[i];if(!L)continue;for(let p=sc-1;p>=0;p--){ctx.setTransform(c,s*K,-s,c*K,sx*sc,(sy-i*ZS)*sc-p);ctx.drawImage(L,hw,hd)}}}
+let SPRN=0;
+function sprite(m,rot,sc){sc=sc||1;let q=Math.round(rot/TAU*QN)%QN;if(q<0)q+=QN;const key=q*4+sc;let s=m.cache[key];if(!s){
+  const diag=Math.ceil(Math.hypot(m.w,m.d))+2,chh=Math.ceil(diag*K)+m.h*ZS+2,cv=mk(diag*sc,chh*sc),c=cv.getContext('2d');c.imageSmoothingEnabled=false;
+  const ox=diag/2,oy=chh-Math.ceil(diag*K/2)-1;drawStack(c,m,ox,oy,q*TAU/QN,sc);s=m.cache[key]={cv,ox:ox*sc,oy:oy*sc};SPRN++}return s}
 
 /* ============ palette ============ */
 const WH=0xf6f4ee,BK=0x26262b,RD=0xd23b2e,OR=0xf28c1e,YL=0xf2cf3a,GN=0x4c9a3f,DG=0x2f6b34,BLUE=0x1e5fb4,DBLUE=0x163f7a,LB=0x7fc4ee,PU=0x7b3fa0,PK=0xf2a0b5,
