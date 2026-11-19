@@ -123,6 +123,7 @@ let S={found:{},lit:Array(10).fill(false)};
 try{const s=JSON.parse(localStorage.getItem(SAVE));if(s&&s.lit&&s.lit.length===10&&s.found)S=s}catch(e){}
 for(const k of['feathers','letters','chests','seen'])if(!S[k]||typeof S[k]!=='object')S[k]={};
 const save=()=>{try{localStorage.setItem(SAVE,JSON.stringify(S))}catch(e){}};
+const FPS=/[?&]fps/.test(location.search)?document.body.appendChild(Object.assign(document.createElement('div'),{id:'fps'})):null;
 const DEBUG=/[?&]debug/.test(location.search),NOAUTO=/[?&]noauto/.test(location.search);
 let state='title',muted=false,musOn=true,T=0,SC=/[?&]sc=1/.test(location.search)?1:2;
 const player={x:0,y:22,z:TS,dir:Math.PI/2,vx:0,vy:0,moving:false,sprint:false},cam={x:0,y:0,r:0,vr:0},keys={},ptr={down:false,x:0,y:0},joy={id:null,ox:0,oy:0,dx:0,dy:0};
@@ -425,6 +426,8 @@ function frame(now){const raw=now-last,dt=Math.min(0.05,raw/1000);last=now;
   if(raw<200){ema+=(raw-ema)*0.05;FT.push(raw);if(FT.length>600)FT.shift()}
   if(!NOAUTO&&auto){if(SC===2&&fr>90){if(ema>27)slow++;else slow=Math.max(0,slow-1);if(slow>90){emaHi=ema;chk=fr+180;SC=1;freeCache();resize()}}
     else if(SC===1&&fr===chk){auto=false;if(ema>emaHi*0.8){SC=2;freeCache();resize()}}} // half resolution only if it actually helps
+  if(FPS&&fr%30===0&&FT.length>20){const f=FT.slice(-300).sort((a,b)=>a-b),md=f[f.length>>1],el=('speechSynthesis'in window)?speechSynthesis.getVoices().filter(v=>v.lang&&v.lang.toLowerCase().startsWith('el')).length:-1;
+    FPS.textContent=`${(1000/md).toFixed(0)} fps · median ${md.toFixed(1)} ms · p95 ${f[Math.floor(f.length*0.95)].toFixed(1)} ms · worst ${f[f.length-1].toFixed(0)} ms · res x${SC} · ${cv.width}x${cv.height} · audio ${AC?AC.state:'off'} · greek voices ${el} · touch ${TOUCH} · joy ${joy.id!==null?joy.dx.toFixed(1)+','+joy.dy.toFixed(1):'-'} · ${state}`}
   update(dt);render();if(state==='card')drawSpin(spin.c,cardW);else if(state==='quiz'&&quiz&&quiz.cur)drawSpin(spin.q,quiz.cur.w);else if(state==='title')drawTitle();if(fr++%6===0)minimap();requestAnimationFrame(frame)}
 requestAnimationFrame(frame);
 function selfTest(){const r={words:WD.length,objs:OBJ.length,objsOffGrass:0,altarsOff:0,bridgeGaps:0,bridges:BRIDGES.length,tooClose:0,feathers:FEATHERS.length,feathersOff:0,letters:LETTERS.length,lettersOff:0,letterIds:new Set(LETTERS.map(l=>l.i)).size,emptyGlyphs:ALPHA.filter(a=>a.m.glyph<8).length,pickupNearPed:0};
