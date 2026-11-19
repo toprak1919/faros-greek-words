@@ -105,11 +105,12 @@ kbd{background:#e8eef7;border:1px solid #b9c7dc;border-radius:5px;padding:1px 6p
 .sticky{position:sticky;bottom:-16px;background:linear-gradient(transparent,#fdfdfb 30%);padding:14px 0 16px;margin-bottom:-16px}
 #map .panel{width:auto;padding:12px;background:#bfe3f7}
 #mapC{display:block;width:min(86vw,74vh,640px);height:auto;border-radius:10px}
+.trial #toasts{top:calc(170px + var(--st))}
 @media(max-width:620px){.big{font-size:32px}#banner .n{font-size:19px}#banner .s{font-size:12px}#banner{top:calc(38px + var(--st));max-width:calc(100vw - 120px);left:calc(8px + var(--sl));transform:translate(0,-8px);text-align:left}#banner.on{transform:none}
   #ask{top:calc(146px + var(--st));max-width:96vw;min-width:0;width:96vw;padding:6px 12px 8px}#ask .big{font-size:30px}#mini{width:92px;height:92px}#btns{top:calc(106px + var(--st))}#title h1{font-size:36px}#title p{font-size:14px}
-  .pill{font-size:11px;padding:3px 7px}#hud{max-width:calc(100vw - 112px);gap:4px;flex-wrap:nowrap}#hint{font-size:13px;bottom:calc(92px + var(--sb))}#act{bottom:calc(140px + var(--sb))}#toasts{top:calc(128px + var(--st))}.lw{grid-template-columns:1fr}.lw.ab{grid-template-columns:1fr 1fr}.panel{padding:16px 14px 12px}.stripe{margin:-16px -14px 12px}.opt{font-size:17px}}
+  .pill{font-size:11px;padding:3px 7px}#hud{max-width:calc(100vw - 112px);gap:4px;flex-wrap:nowrap}#hint{font-size:13px;bottom:calc(92px + var(--sb))}#act{bottom:calc(140px + var(--sb))}#toasts{top:calc(128px + var(--st))}.trial #toasts{top:calc(290px + var(--st))}.lw{grid-template-columns:1fr}.lw.ab{grid-template-columns:1fr 1fr}.panel{padding:16px 14px 12px}.stripe{margin:-16px -14px 12px}.opt{font-size:17px}}
 @media(max-height:480px){.big{font-size:28px;margin:2px 0}.spr{height:22vh}.panel{padding:12px 16px 10px}.stripe{margin:-12px -16px 8px;height:6px}.opts{gap:6px;margin-top:6px}.opt{min-height:44px;padding:5px;font-size:16px}.row{margin-top:8px}.pb{padding:8px 18px}.en{font-size:19px;margin:2px 0}
-  #title h1{font-size:30px}#title p{font-size:13px;margin:5px 0;line-height:1.35}#tSpr{height:44px;width:auto}#banner{top:calc(36px + var(--st))}#banner .n{font-size:18px}#banner .s{font-size:12px}#hud{transition:opacity .3s}.trial #hud{opacity:0}#hint{bottom:calc(8px + var(--sb));font-size:12px;max-width:calc(100vw - 300px)}#act{bottom:calc(46px + var(--sb));padding:9px 20px}#mini{width:84px;height:84px}#btns{top:calc(98px + var(--st))}#ask{padding:5px 14px 7px}#ask .big{font-size:26px}.fb{margin-top:4px;min-height:18px;font-size:13px}#toasts{top:calc(52px + var(--st))}}
+  #title h1{font-size:30px}#title p{font-size:13px;margin:5px 0;line-height:1.35}#tSpr{height:44px;width:auto}#banner{top:calc(42px + var(--st))}#banner .n{font-size:18px}#banner .s{font-size:12px}#hud{transition:opacity .3s}.trial #hud{opacity:0}#hint{bottom:calc(8px + var(--sb));font-size:12px;max-width:calc(100vw - 300px)}#act{bottom:calc(46px + var(--sb));padding:9px 20px}#mini{width:84px;height:84px}#btns{top:calc(98px + var(--st))}#ask{padding:5px 14px 7px}#ask .big{font-size:26px}.fb{margin-top:4px;min-height:18px;font-size:13px}#toasts{top:calc(92px + var(--st))}.trial #toasts{top:calc(150px + var(--st))}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -194,7 +195,7 @@ kbd{background:#e8eef7;border:1px solid #b9c7dc;border-radius:5px;padding:1px 6p
   <div class="row" style="margin-top:8px"><button class="pb sm" id="mapClose">Close<span class="kb"> (M)</span></button></div>
 </div></div>
 
-<script src="sprites.js?v=3"></script>
-<script src="game.js?v=3"></script>
+<script src="sprites.js?v=4"></script>
+<script src="game.js?v=4"></script>
 </body>
 </html>

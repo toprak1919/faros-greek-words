@@ -292,7 +292,7 @@ function moveHero(dt){
   else if(mag){ // blocked by an edge: ride the bridge you are on, or head for the bridge that leads where you are pushing
     const d=isletOf(player.x,player.y);let rb=null;
     if(!d){const nb=nearestBridge(player.x,player.y);if(nb.dist<4.4)rb=nb.b}
-    else{let best=null,bd=0.05;for(const m of mouths(d)){const dt2=m[2]*wx+m[3]*wy;if(dt2>bd){bd=dt2;best=m}}
+    else{let best=null,bd=ptr.down?0.05:0.3;for(const m of mouths(d)){const dt2=m[2]*wx+m[3]*wy;if(dt2>bd){bd=dt2;best=m}}
       if(best){if(proj(best[4],player.x,player.y).dist<4.4)rb=best[4];else{seek={m:best,wx,wy,t:T+4};mv=step(best[0],best[1])}}}
     if(rb&&!mv){const ax=Math.cos(rb.a),ay=Math.sin(rb.a),dp=wx*ax+wy*ay;if(Math.abs(dp)>0.15){const t2=clamp(proj(rb,player.x,player.y).t+Math.sign(dp)*sp*1.5,0,rb.len);mv=step(rb.x0+ax*t2,rb.y0+ay*t2)}}
     if(!mv)for(const da of[0.5,-0.5,1,-1,1.45,-1.45]){const ca=Math.cos(da),sa=Math.sin(da);if(step(player.x+(wx*ca-wy*sa)*sp,player.y+(wx*sa+wy*ca)*sp)){mv=true;break}}
@@ -310,7 +310,7 @@ function update(dt){
   T+=dt;
   for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.z+=p.vz*dt;p.vz-=p.g*dt;if(p.t>p.life||p.z<-2)parts.splice(i,1)}
   for(const b of birds){b.x+=Math.cos(b.a)*26*dt;b.y+=Math.sin(b.a)*26*dt;const dx=b.x-cam.x,dy=b.y-cam.y;if(dx*dx+dy*dy>560*560){const a=Math.random()*TAU;b.x=cam.x+Math.cos(a)*540;b.y=cam.y+Math.sin(a)*540;b.a=a+Math.PI+(Math.random()-0.5)*1.2}}
-  if(state==='title'){cam.r+=dt*0.1;cam.x=ZONES[0].x*0.5;cam.y=ZONES[0].y*0.62;return}
+  if(state==='title'){cam.vr=0.1;cam.r+=dt*0.1;cam.x=ZONES[0].x*0.5;cam.y=ZONES[0].y*0.62;return}
   let turn=0;
   if(state==='play'||state==='fetch'){
     turn=moveHero(dt);
@@ -420,10 +420,11 @@ function drawSpin(x,w){const m=WD[w].m,c=x.canvas,dg=Math.ceil(Math.hypot(m.w,m.
 const titleSet=shuffle([...Array(100)].map((_,i)=>i)).slice(0,7);
 function drawTitle(){const x=spin.t;x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,210,36);x.imageSmoothingEnabled=false;titleSet.forEach((w,i)=>drawStack(x,WD[w].m,15+i*30,27+Math.sin(T*2+i)*1.5,T*0.9+i))}
 
-let last=performance.now(),fr=0,ema=16,slow=0;const FT=[];
+let last=performance.now(),fr=0,ema=16,slow=0,auto=true,emaHi=0,chk=-1;const FT=[];
 function frame(now){const raw=now-last,dt=Math.min(0.05,raw/1000);last=now;
   if(raw<200){ema+=(raw-ema)*0.05;FT.push(raw);if(FT.length>600)FT.shift()}
-  if(!NOAUTO&&SC===2&&fr>90){if(ema>27)slow++;else slow=Math.max(0,slow-1);if(slow>90){SC=1;freeCache();resize()}}
+  if(!NOAUTO&&auto){if(SC===2&&fr>90){if(ema>27)slow++;else slow=Math.max(0,slow-1);if(slow>90){emaHi=ema;chk=fr+180;SC=1;freeCache();resize()}}
+    else if(SC===1&&fr===chk){auto=false;if(ema>emaHi*0.8){SC=2;freeCache();resize()}}} // half resolution only if it actually helps
   update(dt);render();if(state==='card')drawSpin(spin.c,cardW);else if(state==='quiz'&&quiz&&quiz.cur)drawSpin(spin.q,quiz.cur.w);else if(state==='title')drawTitle();if(fr++%6===0)minimap();requestAnimationFrame(frame)}
 requestAnimationFrame(frame);
 function selfTest(){const r={words:WD.length,objs:OBJ.length,objsOffGrass:0,altarsOff:0,bridgeGaps:0,bridges:BRIDGES.length,tooClose:0,feathers:FEATHERS.length,feathersOff:0,letters:LETTERS.length,lettersOff:0,letterIds:new Set(LETTERS.map(l=>l.i)).size,emptyGlyphs:ALPHA.filter(a=>a.m.glyph<8).length,pickupNearPed:0};
