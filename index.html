@@ -25,7 +25,7 @@ button{font:inherit;cursor:pointer;touch-action:manipulation;-webkit-user-select
 #hud{position:fixed;top:calc(8px + var(--st));left:calc(8px + var(--sl));display:flex;gap:6px;flex-wrap:wrap;pointer-events:none;max-width:calc(100vw - 150px - var(--sl) - var(--sr))}
 .pill{background:rgba(8,32,66,.78);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:5px 10px;font-size:13px;font-weight:700;white-space:nowrap}
 .pill b{color:#ffd95e}
-#mini{position:fixed;top:calc(8px + var(--st));right:calc(8px + var(--sr));width:112px;height:112px;border-radius:12px;border:1px solid rgba(255,255,255,.45);background:rgba(8,32,66,.6);cursor:pointer}
+#mini{position:fixed;top:calc(8px + var(--st));right:calc(8px + var(--sr));width:112px;height:112px;border-radius:50%;cursor:pointer;filter:drop-shadow(0 2px 5px rgba(0,20,50,.5))}
 #btns{position:fixed;top:calc(126px + var(--st));right:calc(8px + var(--sr));display:flex;gap:6px}
 .sb{background:rgba(8,32,66,.78);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:10px;min-width:34px;height:34px;padding:0 8px;font-size:15px;font-weight:700;transition:transform .1s,background .15s}
 .sb:hover{background:var(--blue)}.sb:active{transform:scale(.92)}.sb.off{opacity:.45}
@@ -46,6 +46,15 @@ button{font:inherit;cursor:pointer;touch-action:manipulation;-webkit-user-select
 #knob{position:absolute;left:50%;top:50%;width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.75);box-shadow:0 2px 8px rgba(0,0,0,.3);transform:translate(-50%,-50%)}
 .tag{position:fixed;left:0;top:0;background:rgba(255,255,255,.93);color:var(--ink);border-radius:6px;padding:1px 7px;font-size:14px;font-weight:700;pointer-events:none;white-space:nowrap;display:none;box-shadow:0 1px 3px rgba(0,0,0,.3);will-change:transform}
 .tag.sign{background:rgba(21,88,168,.92);color:#fff;font-size:13px}
+.tag.bub{border-radius:10px;padding:3px 9px;text-align:center;line-height:1.15}.tag.bub small{display:block;font:italic 500 11px system-ui,sans-serif;color:#5a6f8f}
+#veh{position:fixed;right:calc(14px + var(--sr));bottom:calc(78px + var(--sb));background:var(--blue);color:#fff;border:2px solid #fff;border-radius:14px;padding:11px 16px;font-size:16px;font-weight:800;white-space:nowrap;box-shadow:0 4px 0 #0b3a78,0 8px 18px rgba(0,0,0,.3);opacity:0;pointer-events:none;transform:translateY(10px) scale(.9);transition:opacity .2s,transform .2s cubic-bezier(.3,1.5,.5,1)}
+#veh.on{opacity:1;pointer-events:auto;transform:none}#veh:active{transform:translateY(3px);box-shadow:none}
+.touch #veh{bottom:calc(98px + var(--sb));padding:14px 18px;font-size:17px}
+.driving .rot{display:none}.driving #veh{bottom:calc(22px + var(--sb))}
+#job{position:fixed;left:50%;top:calc(8px + var(--st));transform:translate(-50%,-20px);opacity:0;pointer-events:none;background:#fdfdfb;color:var(--ink);border:3px solid #e8b923;border-radius:14px;padding:6px 14px 8px;text-align:center;min-width:300px;max-width:calc(100vw - 280px);box-shadow:0 8px 24px rgba(0,0,0,.35);transition:opacity .3s,transform .3s}
+#job.on{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+#job .big{font-size:26px;margin:0}#job .tr{font-size:14px;margin-left:8px}#job .fb{margin-top:2px;min-height:18px;font-size:13px}#jT{font-size:16px;color:var(--ink);font-variant-numeric:tabular-nums}
+.jobon #toasts{top:calc(150px + var(--st))}
 #toasts{position:fixed;left:50%;top:calc(78px + var(--st));transform:translateX(-50%);display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none;width:min(94vw,460px)}
 .toast{background:#fdfdfb;color:var(--ink);border:2px solid var(--blue);border-radius:12px;padding:8px 14px;font-size:14px;line-height:1.35;box-shadow:0 6px 18px rgba(0,0,0,.3);display:flex;gap:12px;align-items:center;animation:tin .35s cubic-bezier(.3,1.4,.5,1);transition:opacity .4s,transform .4s}
 .toast.out{opacity:0;transform:translateY(-8px)}
@@ -108,10 +117,10 @@ kbd{background:#e8eef7;border:1px solid #b9c7dc;border-radius:5px;padding:1px 6p
 #mapC{display:block;width:min(86vw,74vh,640px);height:auto;border-radius:10px}
 .trial #toasts{top:calc(170px + var(--st))}
 @media(max-width:620px){.big{font-size:32px}#banner .n{font-size:19px}#banner .s{font-size:12px}#banner{top:calc(38px + var(--st));max-width:calc(100vw - 120px);left:calc(8px + var(--sl));transform:translate(0,-8px);text-align:left}#banner.on{transform:none}
-  #ask{top:calc(146px + var(--st));max-width:96vw;min-width:0;width:96vw;padding:6px 12px 8px}#ask .big{font-size:30px}#mini{width:92px;height:92px}#btns{top:calc(106px + var(--st))}#title h1{font-size:36px}#title p{font-size:14px}
-  .pill{font-size:11px;padding:3px 7px}#hud{max-width:calc(100vw - 112px);gap:4px;flex-wrap:nowrap}#hint{font-size:13px;bottom:calc(92px + var(--sb))}#act{bottom:calc(140px + var(--sb));font-size:16px;padding:12px 20px}#toasts{top:calc(150px + var(--st))}.trial #toasts{top:calc(290px + var(--st))}.lw{grid-template-columns:1fr}.lw.ab{grid-template-columns:1fr 1fr}.panel{padding:16px 14px 12px}.stripe{margin:-16px -14px 12px}.opt{font-size:17px}}
+  #ask{top:calc(146px + var(--st));max-width:96vw;min-width:0;width:96vw;padding:6px 12px 8px}#ask .big{font-size:30px}#mini{width:92px;height:92px}#btns{top:calc(106px + var(--st))}#job{top:calc(146px + var(--st));max-width:96vw;min-width:0;width:96vw;padding:5px 10px 7px}#job .big{font-size:23px}.jobon #toasts{top:calc(280px + var(--st))}#veh,.touch #veh{bottom:calc(200px + var(--sb))}.driving #veh,.touch.driving #veh{bottom:calc(22px + var(--sb))}#title h1{font-size:36px}#title p{font-size:14px}
+  .pill{font-size:11px;padding:3px 6px}#hud{max-width:calc(100vw - 108px);gap:3px;flex-wrap:nowrap}#hint{font-size:13px;bottom:calc(92px + var(--sb))}#act{bottom:calc(140px + var(--sb));font-size:16px;padding:12px 20px}#toasts{top:calc(150px + var(--st))}.trial #toasts{top:calc(290px + var(--st))}.lw{grid-template-columns:1fr}.lw.ab{grid-template-columns:1fr 1fr}.panel{padding:16px 14px 12px}.stripe{margin:-16px -14px 12px}.opt{font-size:17px}}
 @media(max-height:480px){.big{font-size:28px;margin:2px 0}.spr{height:22vh}.panel{padding:12px 16px 10px}.stripe{margin:-12px -16px 8px;height:6px}.opts{gap:6px;margin-top:6px}.opt{min-height:44px;padding:5px;font-size:16px}.row{margin-top:8px}.pb{padding:8px 18px}.en{font-size:19px;margin:2px 0}
-  #title h1{font-size:30px}#title p{font-size:13px;margin:5px 0;line-height:1.35}#tSpr{height:44px;width:auto}#banner{top:calc(42px + var(--st))}#banner .n{font-size:18px}#banner .s{font-size:12px}#hud{transition:opacity .3s}.trial #hud{opacity:0}#hint{bottom:calc(8px + var(--sb));font-size:12px;max-width:calc(100vw - 300px)}#act{bottom:calc(46px + var(--sb));padding:9px 20px}#mini{width:84px;height:84px}#btns{top:calc(98px + var(--st))}#ask{padding:5px 14px 7px}#ask .big{font-size:26px}.fb{margin-top:4px;min-height:18px;font-size:13px}#toasts{top:calc(92px + var(--st))}.trial #toasts{top:calc(150px + var(--st))}}
+  #title h1{font-size:30px}#title p{font-size:13px;margin:5px 0;line-height:1.35}#tSpr{height:44px;width:auto}#banner{top:calc(42px + var(--st))}#banner .n{font-size:18px}#banner .s{font-size:12px}#hud{transition:opacity .3s}.trial #hud{opacity:0}#hint{bottom:calc(8px + var(--sb));font-size:12px;max-width:calc(100vw - 300px)}#act{bottom:calc(46px + var(--sb));padding:9px 20px}#mini{width:84px;height:84px}#btns{top:calc(98px + var(--st))}#ask{padding:5px 14px 7px}#ask .big{font-size:26px}#job{padding:3px 12px 5px}#job .big{font-size:20px;display:inline}#job .tr{display:inline;margin-left:8px}.jobon #hud{opacity:0}.jobon #toasts{top:calc(120px + var(--st))}.touch #veh{bottom:calc(92px + var(--sb));padding:10px 16px}.driving #veh{bottom:calc(14px + var(--sb))}.fb{margin-top:4px;min-height:18px;font-size:13px}#toasts{top:calc(92px + var(--st))}.trial #toasts{top:calc(150px + var(--st))}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -123,6 +132,7 @@ kbd{background:#e8eef7;border:1px solid #b9c7dc;border-radius:5px;padding:1px 6p
   <div class="pill" title="Things named">📜 <b id="hFound">0</b>/100</div>
   <div class="pill" title="Golden feathers">🪶 <b id="hFeather">0</b></div>
   <div class="pill" title="Greek letters found"><span class="gr">Αα</span> <b id="hLet">0</b>/24</div>
+  <div class="pill" title="Earned from deliveries">€<b id="hCash">0</b></div>
 </div>
 <canvas id="mini" width="128" height="128" title="Open the map (M)"></canvas>
 <div id="btns">
@@ -133,6 +143,7 @@ kbd{background:#e8eef7;border:1px solid #b9c7dc;border-radius:5px;padding:1px 6p
 <div id="toasts"></div>
 <div id="hint"></div>
 <button id="act"><span id="actT"></span><span class="kb"> (Space)</span></button>
+<button id="veh"><span id="vehT"></span><span class="kb"> (F)</span></button>
 <button class="rot" id="rL" title="Turn the view (Q)" aria-label="Turn view left">⟲</button>
 <button class="rot" id="rR" title="Turn the view (E)" aria-label="Turn view right">⟳</button>
 <div id="joy"><div id="knob"></div></div>
@@ -145,17 +156,23 @@ kbd{background:#e8eef7;border:1px solid #b9c7dc;border-radius:5px;padding:1px 6p
   <div class="row" style="margin-top:4px"><button class="pb alt sm" id="aHear">🔊 Again<span class="kb"> (Space)</span></button><button class="pb alt sm" id="aQuit">Leave trial<span class="kb"> (Esc)</span></button></div>
 </div>
 
+<div id="job">
+  <div class="kick"><span id="jK"></span> · ⏱ <b id="jT"></b></div>
+  <div><span class="big gr" id="jEl"></span><span class="tr" id="jTr"></span></div>
+  <div class="fb" id="jFb"></div>
+  <div class="row" style="margin-top:2px"><button class="pb alt sm" id="jHear">🔊 Again</button><button class="pb alt sm" id="jQuit">Drop the job</button></div>
+</div>
+
 <div class="ov on" id="title"><div class="panel">
   <div class="stripe"></div>
-  <div class="kick">a journey through Greece in a hundred words</div>
+  <div class="kick">an open road through Greece in a hundred words</div>
   <h1>ΤΑΞΙΔΙ</h1>
   <div class="tr">taxídi — “journey”</div>
   <canvas id="tSpr" width="210" height="36"></canvas>
-  <p>You have just arrived in Greece. Travel from <b>Delphi</b> to Athens, Thessaloniki, Santorini, Crete and six more places.
-  In every town square, <b>ten things stand on pedestals</b> — walk up to each one to learn its Greek name, then take the locals' challenge at the flagpole.</p>
-  <p>Raise all ten flags and you will know <b>100 Greek words</b>. Along the way, visit the sights, collect golden feathers and the 24 letters of the alphabet, and look for corners of Greece that are not on the map.</p>
-  <p class="small desk"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / arrows to walk · <kbd>Shift</kbd> run · or hold the mouse where you want to go · <kbd>Q</kbd><kbd>E</kbd> turn the view · <kbd>M</kbd> map · <kbd>L</kbd> lexicon</p>
-  <p class="small mob">Drag anywhere to walk — push further to run. ⟲ ⟳ turn the view. Tap the little map to open it.</p>
+  <p>All of Greece is one open map: the mainland, the Peloponnese and the islands. <b>Walk, take any parked car or moped, and sail a boat</b> from the piers to reach ten towns — Athens, Thessaloniki, Santorini, Crete and more.</p>
+  <p>In every town square <b>ten things stand on pedestals</b>: go up to each to learn its Greek name, then take the locals' challenge at the flagpole. Raise all ten flags and you know <b>100 Greek words</b>. Kiosks hand out timed <b>delivery jobs</b> that test what you learned; feathers, letters, sights and hidden corners wait off the road.</p>
+  <p class="small desk"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> walk / drive · <kbd>Shift</kbd> run · <kbd>F</kbd> get in or out · <kbd>Space</kbd> act · <kbd>Q</kbd><kbd>E</kbd> turn the view · <kbd>M</kbd> map · <kbd>L</kbd> lexicon</p>
+  <p class="small mob">Drag anywhere to walk or steer. Tap the blue button by a car or boat to take it. Tap the round radar for the full map.</p>
   <div class="row"><button class="pb" id="bStart">Begin · Πάμε!</button></div>
 </div></div>
 
@@ -196,7 +213,7 @@ kbd{background:#e8eef7;border:1px solid #b9c7dc;border-radius:5px;padding:1px 6p
   <div class="row" style="margin-top:8px"><button class="pb sm" id="mapClose">Close<span class="kb"> (M)</span></button></div>
 </div></div>
 
-<script src="sprites.js?v=8"></script>
-<script src="game.js?v=8"></script>
+<script src="sprites.js?v=9"></script>
+<script src="game.js?v=9"></script>
 </body>
 </html>
