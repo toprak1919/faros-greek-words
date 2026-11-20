@@ -141,7 +141,7 @@ const LS=6,LW=Math.ceil(GW/LS),LAB=new Int16Array(LW*Math.ceil(GH/LS));
 {let id=0;const H=Math.ceil(GH/LS),q=new Int32Array(LAB.length),ok=i=>TY[Math.min(GW-1,(i%LW)*LS+3)+Math.min(GH-1,Math.floor(i/LW)*LS+3)*GW]>=0;
   for(let s=0;s<LAB.length;s++){if(LAB[s]||!ok(s))continue;id++;let h=0,t=0;q[t++]=s;LAB[s]=id;while(h<t){const i=q[h++],x=i%LW,y=Math.floor(i/LW);for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy,j=nx+ny*LW;if(nx<0||ny<0||nx>=LW||ny>=H||LAB[j]||!ok(j))continue;LAB[j]=id;q[t++]=j}}}}
 function landOf(x,y){const cx=Math.floor((x-GX0)/LS),cy=Math.floor((y-GY0)/LS);for(let r=0;r<3;r++)for(let j=-r;j<=r;j++)for(let i=-r;i<=r;i++){const X=cx+i,Y=cy+j;if(X<0||Y<0||X>=LW||Y*LW>=LAB.length)continue;const l=LAB[X+Y*LW];if(l)return l}return 0}
-ISLETS.forEach(d=>d.land=landOf(d.x,d.y));PIERS.forEach(p=>p.land=landOf(p.bx,p.by));
+ISLETS.forEach(d=>d.land=landOf(d.x,d.y));PIERS.forEach(p=>p.land=landOf(p.bx,p.by));const PORTS=new Set(PIERS.map(p=>p.land)); // landmasses you can always leave
 /* placing things */
 const OW=GW>>2,OH=GH>>2,OC=new Uint8Array(OW*OH);
 function occ(x,y,r,set){const x0=Math.max(0,Math.floor((x-r-GX0)/4)),x1=Math.min(OW-1,Math.floor((x+r-GX0)/4)),y0=Math.max(0,Math.floor((y-r-GY0)/4)),y1=Math.min(OH-1,Math.floor((y+r-GY0)/4));for(let j=y0;j<=y1;j++)for(let i=x0;i<=x1;i++){if(set)OC[i+j*OW]=1;else if(OC[i+j*OW])return false}return true}
@@ -200,7 +200,7 @@ const save=()=>{try{localStorage.setItem(SAVE,JSON.stringify(S))}catch(e){}};
 const FPS=/[?&]fps/.test(location.search)?document.body.appendChild(Object.assign(document.createElement('div'),{id:'fps'})):null;
 const DEBUG=/[?&]debug/.test(location.search),NOAUTO=/[?&]noauto/.test(location.search);
 let state='title',muted=false,musOn=true,T=0,SC=/[?&]sc=1/.test(location.search)?1:2;
-const SP=S.px&&walkable(S.px,S.py)&&SOLIDS.every(o=>Math.hypot(o.x-S.px,o.y-S.py)>o.r+1)?[S.px,S.py]:[HUB.x,HUB.y+46];
+const SP=S.px&&walkable(S.px,S.py)&&PORTS.has(landOf(S.px,S.py))&&SOLIDS.every(o=>Math.hypot(o.x-S.px,o.y-S.py)>o.r+1)?[S.px,S.py]:[HUB.x,HUB.y+46];
 const player={x:SP[0],y:SP[1],z:groundZ(SP[0],SP[1]),dir:Math.PI/2,vx:0,vy:0,moving:false,sprint:false,veh:null},cam={x:0,y:0,r:0,vr:0},keys={},ptr={down:false,x:0,y:0},joy={id:null,ox:0,oy:0,dx:0,dy:0};
 let rotHeld=0;
 const foundOn=i=>{let n=0;for(let k=0;k<10;k++)if(S.found[i*10+k])n++;return n};
@@ -433,7 +433,7 @@ function update(dt){
   T+=dt;
   for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.z+=p.vz*dt;p.vz-=p.g*dt;if(p.t>p.life||p.z<-2)parts.splice(i,1)}
   for(const b of birds){b.x+=Math.cos(b.a)*26*dt;b.y+=Math.sin(b.a)*26*dt;const dx=b.x-cam.x,dy=b.y-cam.y;if(dx*dx+dy*dy>560*560){const a=Math.random()*TAU;b.x=cam.x+Math.cos(a)*540;b.y=cam.y+Math.sin(a)*540;b.a=a+Math.PI+(Math.random()-0.5)*1.2}}
-  for(const c of VEH){if(c.ai){if(Math.hypot(c.x-cam.x,c.y-cam.y)<700||state==='title')aiCar(c,dt)}else if(c!==player.veh){c.v*=1-Math.min(1,dt*4);if(c.pier&&Math.hypot(c.x-c.hx,c.y-c.hy)>24&&Math.hypot(c.x-player.x,c.y-player.y)>280){c.x=c.hx;c.y=c.hy;c.a=c.ha}}}
+  for(const c of VEH){if(c.ai){if(Math.hypot(c.x-cam.x,c.y-cam.y)<700||state==='title')aiCar(c,dt)}else if(c!==player.veh){c.v*=1-Math.min(1,dt*4);if(c.pier&&(myLand<0||PORTS.has(myLand))&&Math.hypot(c.x-c.hx,c.y-c.hy)>24&&Math.hypot(c.x-player.x,c.y-player.y)>280){c.x=c.hx;c.y=c.hy;c.a=c.ha}}}
   for(const p of PEDS)if(Math.abs(p.x-cam.x)<300&&Math.abs(p.y-cam.y)<300)pedUpdate(p,dt);
   if(state==='title'){cam.vr=0.1;cam.r+=dt*0.1;cam.x=ZONES[6].x-30;cam.y=ZONES[6].y+20;return}
   let turn=0;const V=player.veh,playing=state==='play'||state==='fetch';
@@ -452,7 +452,7 @@ function update(dt){
         if(q<11&&!V&&touched!==sec&&state==='play'){touched=sec;openChest(sec)}}
       if(job){job.t-=dt;if(job.phase&&Math.hypot(job.dest.kiosk.x-player.x,job.dest.kiosk.y-player.y)<15)jobDone();else if(job.t<=0){bad();endJob('<b class="gr big2" style="font-size:22px">Άργησες!</b> <span><em>áryises</em> — “you are late”<br>The delivery was cancelled. Try another one.</span>')}
         else{const s=Math.ceil(job.t);if(s!==jobSec){jobSec=s;$('jT').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');$('jT').style.color=s<=10?'#d04a3a':''}}}
-      saveT-=dt;if(saveT<0&&(!V||V.kind!=='boat')&&walkable(player.x,player.y)){saveT=3;if(Math.hypot((S.px||0)-player.x,(S.py||0)-player.y)>25){S.px=Math.round(player.x);S.py=Math.round(player.y);save()}}
+      saveT-=dt;if(saveT<0&&(!V||V.kind!=='boat')&&PORTS.has(myLand)&&walkable(player.x,player.y)){saveT=3;if(Math.hypot((S.px||0)-player.x,(S.py||0)-player.y)>25){S.px=Math.round(player.x);S.py=Math.round(player.y);save()}}
     }
   }else{player.vx=player.vy=0;player.moving=false;if(V)V.v*=1-Math.min(1,dt*6)}
   if(V){let d=0;if(playing)d=angDiff(-Math.PI/2-V.a,cam.r)*Math.min(1,dt*2.6*clamp(Math.abs(V.v)/70,0.45,1));if(Math.abs(d)<0.00004)d=0;cam.r+=d;cam.vr=dt>0?d/dt:0}
@@ -605,7 +605,7 @@ function frame(now){const raw=now-last,dt=Math.min(0.05,raw/1000);last=now;
   if(FPS&&fr%30===0&&FT.length>20){const f=FT.slice(-300).sort((a,b)=>a-b),md=f[f.length>>1],el=('speechSynthesis'in window)?speechSynthesis.getVoices().filter(v=>v.lang&&v.lang.toLowerCase().startsWith('el')).length:-1;
     FPS.textContent=`${(1000/md).toFixed(0)} fps · median ${md.toFixed(1)} ms · p95 ${f[Math.floor(f.length*0.95)].toFixed(1)} ms · worst ${f[f.length-1].toFixed(0)} ms · res x${SC} · ${cv.width}x${cv.height} · tiles ${chunks.size} · audio ${AC?AC.state:'off'} · greek voices ${el} · touch ${TOUCH} · joy ${joy.id!==null?joy.dx.toFixed(1)+','+joy.dy.toFixed(1):'-'} · ${state}${player.veh?' · '+player.veh.t:''}`}
   chunkBudget=fr<3?60:1;update(dt);render();engine();if(state==='card')drawSpin(spin.c,cardW);else if(state==='quiz'&&quiz&&quiz.cur)drawSpin(spin.q,quiz.cur.w);else if(state==='title')drawTitle();if(fr++%4===0)minimap();requestAnimationFrame(frame)}
-requestAnimationFrame(frame);
+requestAnimationFrame(frame);$('bStart').disabled=false;$('bStart').textContent='Begin · Πάμε!';
 /* checks the world is sound: everything stands on land, roads are unbroken, and every landmass you can be left on has a boat */
 function selfTest(){const r={words:WD.length,objs:OBJ.length,objsOff:0,tooClose:0,feathers:FEATHERS.length,feathersOff:0,letters:LETTERS.length,lettersOff:0,letterIds:new Set(LETTERS.map(l=>l.i)).size,emptyGlyphs:ALPHA.filter(a=>a.m.glyph<8).length,pickupNearSolid:0,
     sights:SIGHTS.length,roads:ROADS.length,roadGaps:0,piers:PIERS.length,boats:VEH.filter(v=>v.kind==='boat').length,boatsAground:0,cars:VEH.filter(v=>v.kind==='car').length,carsOff:0,props:props.length,csol:CSOL.length,lands:0,strandable:[],unreachable:[],exitsMin:9};
@@ -618,4 +618,4 @@ function selfTest(){const r={words:WD.length,objs:OBJ.length,objsOff:0,tooClose:
   const lands=new Set(),withBoat=new Set(PIERS.map(p=>p.land));for(const d of ISLETS){lands.add(d.land);if(!d.land)r.unreachable.push(d.en);if(!withBoat.has(d.land)&&d.land!==HUB.land)r.strandable.push(d.en)}if(!withBoat.has(HUB.land))r.strandable.push('mainland');r.lands=lands.size;
   for(const o of[...OBJ,...FEATHERS,...LETTERS,...SIGHTS])if(!withBoat.has(landOf(o.x,o.y)))r.unreachable.push('thing@'+Math.round(o.x)+','+Math.round(o.y));return r}
 window.GAME={S,player,cam,ZONES,HUB,SECRETS,PLACES,OBJ,WD,FEATHERS,LETTERS,SIGHTS,ROADS,PIERS,VEH,PEDS,SOLIDS,CSOL,FT,chunks,ty,landOf,walkable,get state(){return state},get trial(){return trial},get quiz(){return quiz},get riddle(){return riddle},get job(){return job},get curZone(){return curZone},get nearV(){return nearV},get target(){return target},get SC(){return SC},set SC(v){SC=v;freeCache();resize()},
-  startTrial,fetchHit,answer,openCard,closeCard,closeQuiz,openChest,selfTest,tier,featherN,update,enterVeh,exitVeh,startJob,jobPick,keys,joy,ptr,act,vehAct};
+  PORTS,TY,GW,GH,GX0,GY0,startTrial,fetchHit,answer,openCard,closeCard,closeQuiz,openChest,selfTest,tier,featherN,update,enterVeh,exitVeh,startJob,jobPick,keys,joy,ptr,act,vehAct};
