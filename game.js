@@ -492,22 +492,21 @@ function update(dt){
 
 /* ---------- render ---------- */
 /* terrain is painted in 256-unit tiles, built when first needed and dropped when long unseen */
-const CH=256,chunks=new Map();let chunkBudget=12;
+const CH=256,chunks=new Map();let chunkBudget=60;
 const rgb=(c,k)=>[Math.min(255,(c>>16&255)*k),Math.min(255,(c>>8&255)*k),Math.min(255,(c&255)*k)];
 function buildChunk(cx,cy){const x0=GX0+cx*CH-1,y0=GY0+cy*CH-1,S2=CH+2,gx=x0-GX0,gy=y0-GY0;let any=false;
   const idx=(x,y)=>{const X=gx+x,Y=gy+y;return X<0||Y<0||X>=GW||Y>=GH?-1:X+Y*GW};
   for(let y=0;y<S2&&!any;y+=4)for(let x=0;x<S2;x+=4){const i=idx(x,y);if(i>=0&&DQ[i]<26){any=true;break}}if(!any)return null;
   const near=PLACES.filter(p=>Math.abs(p.x-x0-CH/2)<CH/2+190&&Math.abs(p.y-y0-CH/2)<CH/2+190);
   const paint=fn=>{const cv=mk(S2,S2),c=cv.getContext('2d'),im=c.createImageData(S2,S2),D=im.data;let n=0;for(let y=0;y<S2;y++)for(let x=0;x<S2;x++){const i=idx(x,y);if(i<0)continue;const col=fn(TY[i],DQ[i],x+x0,y+y0,i);if(!col)continue;n++;const o=(x+y*S2)*4;D[o]=col[0];D[o+1]=col[1];D[o+2]=col[2];D[o+3]=col[3]==null?255:col[3]}if(!n)return null;c.putImageData(im,0,0);return cv};
-  const g=paint((t,d,x,y)=>t===5?[70,52,40]:t>=0?rgb(0xead9a6,0.92+hash2(x,y,11)*0.12):d<2?[255,255,255,215]:d<7?[90,210,215,150]:d<15?[70,180,215,95]:d<24?[60,150,210,50]:null);
-  const s=paint((t,d,x,y)=>t<1?null:rgb(t===5?0x5c3a22:t===4?0xbfb9a8:t>=2?0x6a6258:0x8a7458,0.85+hash2(x,y*3,13)*0.25));
-  const tp=paint((t,d,x,y,i)=>{if(t<1)return null;
+  const C={x:x0,y:y0,u:0,g:null,s:null,t:null};C.todo=[()=>C.g=paint((t,d,x,y)=>t===5?[70,52,40]:t>=0?rgb(0xead9a6,0.92+hash2(x,y,11)*0.12):d<2?[255,255,255,215]:d<7?[90,210,215,150]:d<15?[70,180,215,95]:d<24?[60,150,210,50]:null),
+  ()=>C.s=paint((t,d,x,y)=>t<1?null:rgb(t===5?0x5c3a22:t===4?0xbfb9a8:t>=2?0x6a6258:0x8a7458,0.85+hash2(x,y*3,13)*0.25)),
+  ()=>C.t=paint((t,d,x,y,i)=>{if(t<1)return null;
     if(t===2)return rgb(0x565962,0.93+hash2(x,y,21)*0.1);if(t===3)return rgb(0xe8e2c8,0.95+hash2(x,y,22)*0.08);if(t===4){const q=((x>>2)+(y>>2))&1;return rgb(q?0xe9e4d6:0xd6d0c0,0.95+hash2(x,y,23)*0.08)}if(t===5)return rgb(((x>>1)+(y>>1))%3?0xb89468:0xa07e54,0.95+hash2(x,y,24)*0.08);
     let c=vnoise(x*0.006,y*0.006,31)>0.52?0xa6bd6e:0x97bd72,bd=150;for(const p of near){const q=Math.hypot(p.x-x,p.y-y)+hash2(x,y,25)*34;if(q<bd){bd=q;c=p.grass}}
     const n=0.93+hash2(x,y,26)*0.1+(vnoise(x*0.14,y*0.14,27)-0.5)*0.14;if(hash2(x,y,28)>0.986)return rgb(c,n*0.8);
-    const X=i%GW,edge=X<1||X>=GW-1||i<GW||i>=GW*(GH-1)||TY[i-1]<1||TY[i+1]<1||TY[i-GW]<1||TY[i+GW]<1;return rgb(c,edge?n*1.12:n)});
-  return{g,s,t:tp,x:x0,y:y0,u:0}}
-function chunkAt(cx,cy){const key=cx+cy*1000;let c=chunks.get(key);if(c===undefined){if(chunkBudget<=0)return null;chunkBudget--;c=buildChunk(cx,cy);chunks.set(key,c)}if(c)c.u=fr;return c}
+    const X=i%GW,edge=X<1||X>=GW-1||i<GW||i>=GW*(GH-1)||TY[i-1]<1||TY[i+1]<1||TY[i-GW]<1||TY[i+GW]<1;return rgb(c,edge?n*1.12:n)})];return C}
+function chunkAt(cx,cy){const key=cx+cy*1000;let c=chunks.get(key);if(c===undefined){c=buildChunk(cx,cy);chunks.set(key,c)}if(c){c.u=fr;while(c.todo.length&&chunkBudget>0){chunkBudget--;c.todo.shift()()}}return c}
 const mkTag=c=>()=>{const e=document.createElement('div');e.className=c;document.body.insertBefore(e,$('banner'));return e},vis=[],tiles=[],tags=[...Array(10)].map(mkTag('tag gr')),signs=[...Array(6)].map(mkTag('tag gr sign')),bubs=[...Array(3)].map(mkTag('tag gr bub'));
 const place=(e,o,up)=>{e.style.display='block';e.style.transform=`translate(calc(${(o.sx/BW*innerWidth).toFixed(1)}px - 50%),calc(${((o.sy-up)/BH*innerHeight).toFixed(1)}px - 100%))`},hide=e=>{if(e.style.display!=='none')e.style.display='none'};
 function render(){
@@ -605,7 +604,7 @@ function frame(now){const raw=now-last,dt=Math.min(0.05,raw/1000);last=now;
     else if(SC===1&&fr===chk){auto=false;if(ema>emaHi*0.8){SC=2;freeCache();resize()}}} // half resolution only if it actually helps
   if(FPS&&fr%30===0&&FT.length>20){const f=FT.slice(-300).sort((a,b)=>a-b),md=f[f.length>>1],el=('speechSynthesis'in window)?speechSynthesis.getVoices().filter(v=>v.lang&&v.lang.toLowerCase().startsWith('el')).length:-1;
     FPS.textContent=`${(1000/md).toFixed(0)} fps · median ${md.toFixed(1)} ms · p95 ${f[Math.floor(f.length*0.95)].toFixed(1)} ms · worst ${f[f.length-1].toFixed(0)} ms · res x${SC} · ${cv.width}x${cv.height} · tiles ${chunks.size} · audio ${AC?AC.state:'off'} · greek voices ${el} · touch ${TOUCH} · joy ${joy.id!==null?joy.dx.toFixed(1)+','+joy.dy.toFixed(1):'-'} · ${state}${player.veh?' · '+player.veh.t:''}`}
-  chunkBudget=fr<3?12:1;update(dt);render();engine();if(state==='card')drawSpin(spin.c,cardW);else if(state==='quiz'&&quiz&&quiz.cur)drawSpin(spin.q,quiz.cur.w);else if(state==='title')drawTitle();if(fr++%4===0)minimap();requestAnimationFrame(frame)}
+  chunkBudget=fr<3?60:1;update(dt);render();engine();if(state==='card')drawSpin(spin.c,cardW);else if(state==='quiz'&&quiz&&quiz.cur)drawSpin(spin.q,quiz.cur.w);else if(state==='title')drawTitle();if(fr++%4===0)minimap();requestAnimationFrame(frame)}
 requestAnimationFrame(frame);
 /* checks the world is sound: everything stands on land, roads are unbroken, and every landmass you can be left on has a boat */
 function selfTest(){const r={words:WD.length,objs:OBJ.length,objsOff:0,tooClose:0,feathers:FEATHERS.length,feathersOff:0,letters:LETTERS.length,lettersOff:0,letterIds:new Set(LETTERS.map(l=>l.i)).size,emptyGlyphs:ALPHA.filter(a=>a.m.glyph<8).length,pickupNearSolid:0,
